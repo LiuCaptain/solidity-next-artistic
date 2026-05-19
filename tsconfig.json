@@ -20,7 +20,8 @@
     ],
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    "outDir": "customDist"
   },
   "include": [
     "next-env.d.ts",
