@@ -1,8 +1,8 @@
 import { network } from "hardhat"
 
 const { ethers } = await network.create({
-  network: "hardhatOp",
-  chainType: "op"
+	network: "hardhatOp",
+	chainType: "op"
 })
 
 console.log("Sending transaction using the OP chain type")
@@ -13,8 +13,8 @@ console.log("Sending 1 wei from", sender.address, "to itself")
 
 console.log("Sending L2 transaction")
 const tx = await sender.sendTransaction({
-  to: sender.address,
-  value: 1n
+	to: sender.address,
+	value: 1n
 })
 
 await tx.wait()
