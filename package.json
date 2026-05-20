@@ -25,13 +25,15 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "babel-plugin-react-compiler": "1.0.0",
+    "chai": "^6.2.2",
     "eslint": "^9",
     "eslint-config-next": "16.2.6",
-    "chai": "^6.2.2",
     "ethers": "^6.16.0",
     "forge-std": "github:foundry-rs/forge-std#v1.9.4",
     "hardhat": "^3.4.5",
     "mocha": "^11.7.5",
+    "prettier": "3.8.3",
+    "sass": "^1.99.0",
     "typescript": "^5"
   }
 }
