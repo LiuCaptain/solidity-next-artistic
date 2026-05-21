@@ -1,12 +1,21 @@
 "use client"
+import { useRef } from "react"
 import styles from "./index.module.scss"
-// import { BrowserProvider } from "ethers"
+import { BrowserProvider, Signer } from "ethers"
 
 const Navigation = () => {
-	const handleConnectWallet = () => {
-		console.log("connect wallet")
-		// if (window.ethereum == null) {
-		// }
+	const provider = useRef<BrowserProvider | null>(null)
+	const signer = useRef<Signer | null>(null)
+
+	const handleConnectWallet = async () => {
+		if (window.ethereum == null) {
+			alert("请安装 Metamask 钱包")
+		} else {
+			provider.current = new BrowserProvider(window.ethereum)
+			signer.current = await provider.current.getSigner()
+			const address = await signer.current.getAddress()
+			console.log("address", address)
+		}
 	}
 
 	return (
