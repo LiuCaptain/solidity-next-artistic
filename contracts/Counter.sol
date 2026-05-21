@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
+// 部署地址： 0x5fbdb2315678afecb367f032d93f642f64180aa3
 pragma solidity ^0.8.28;
 
 contract Counter {
