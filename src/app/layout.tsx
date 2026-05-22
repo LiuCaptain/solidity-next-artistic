@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import EtherProviderContent from "@/provider/EtherProvider"
 import { Geist, Geist_Mono } from "next/font/google"
 import "./globals.css"
 
@@ -24,7 +25,9 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
-			<body>{children}</body>
+			<body>
+				<EtherProviderContent>{children}</EtherProviderContent>
+			</body>
 		</html>
 	)
 }
