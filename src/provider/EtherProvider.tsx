@@ -39,7 +39,10 @@ const EtherProviderContent: React.FC<EtherProviderContentProps> = ({ children })
 			const signer = await provider.getSigner()
 			const address = await signer.getAddress()
 			const balance = await provider.getBalance(address)
+			const network = await provider.getNetwork()
+			console.log("chainId", network.chainId, network)
 			console.log("address", address)
+			console.log("balance", balance)
 
 			setEtherState({
 				provider: provider,
