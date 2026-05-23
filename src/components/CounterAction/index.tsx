@@ -1,12 +1,29 @@
 "use client"
+import { Contract } from "ethers"
+import { useEtherProvider } from "@/provider/EtherProvider"
 import styles from "./index.module.scss"
 import counterJson from "@artifacts/contracts/Counter.sol/Counter.json"
 
 const Computer = () => {
-	const handleIncrement = (type: "normal" | "param") => {
-		const counterABI = counterJson.abi
-		const counterAddress = "0x5fbdb2315678afecb367f032d93f642f64180aa3"
-		console.log("counterABI", counterABI, type, counterAddress)
+	const { provider } = useEtherProvider()
+
+	const handleIncrement = async (type: "normal" | "param") => {
+		try {
+			const counterAddress = "0x5fbdb2315678afecb367f032d93f642f64180aa3"
+			const counterABI = counterJson.abi
+			const contract = new Contract(counterAddress, counterABI, provider)
+
+			switch (type) {
+				case "normal":
+					const tx = await contract.inc()
+					console.log(tx)
+					break
+				case "param":
+					break
+			}
+		} catch (error) {
+			console.log(error)
+		}
 	}
 
 	return (
