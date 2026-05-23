@@ -25,7 +25,7 @@ const CounterAction = () => {
 		setLoadingType(type)
 		try {
 			const contract = new Contract(counterAddress, counterABI, signer)
-			const tx = type === "normal" ? await contract.inc() : await contract.incBy(1)
+			const tx = type === "normal" ? await contract.inc() : await contract.incBy(8n)
 			const receipt = await tx.wait()
 			if (receipt.status === 1) await getCounterValue()
 		} catch (error) {
