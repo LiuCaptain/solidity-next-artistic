@@ -2,8 +2,11 @@
 import { useEffect, useState, useCallback } from "react"
 import { Contract } from "ethers"
 import { useEtherProvider } from "@/provider/EtherProvider"
+import Button from "@/components/Button"
 import styles from "./index.module.scss"
 import counterJson from "@artifacts/contracts/Counter.sol/Counter.json"
+
+type IncrementType = "normal" | "params"
 
 const CounterAction = () => {
 	const { provider, signer, isConnected } = useEtherProvider()
@@ -11,31 +14,24 @@ const CounterAction = () => {
 	const counterABI = counterJson.abi
 
 	const [counterValue, setCounterValue] = useState(0)
+	const [loadingType, setLoadingType] = useState<IncrementType | null>(null)
 	const getCounterValue = useCallback(async () => {
 		const contract = new Contract(counterAddress, counterABI, provider)
 		const x = await contract.x()
 		setCounterValue(Number(x))
 	}, [provider, counterABI])
 
-	const handleIncrement = async (type: "normal" | "param") => {
+	const handleIncrement = async (type: IncrementType) => {
+		setLoadingType(type)
 		try {
 			const contract = new Contract(counterAddress, counterABI, signer)
-			switch (type) {
-				case "normal":
-					{
-						const tx = await contract.inc()
-						const receipt = await tx.wait()
-						console.log("执行", receipt.blockNumber)
-						await getCounterValue()
-					}
-					break
-				case "param":
-					const tx = await contract.incBy()
-					console.log("param", tx)
-					break
-			}
+			const tx = type === "normal" ? await contract.inc() : await contract.incBy(1)
+			const receipt = await tx.wait()
+			if (receipt.status === 1) await getCounterValue()
 		} catch (error) {
 			console.log(error)
+		} finally {
+			setLoadingType(null)
 		}
 	}
 
@@ -64,20 +60,23 @@ const CounterAction = () => {
 				</div>
 
 				<div className={styles.actions}>
-					<button
-						className={styles.primaryButton}
-						type="button"
+					<Button
+						disabled={!!loadingType}
+						loading={loadingType === "normal"}
+						loadingText="调用中..."
 						onClick={() => handleIncrement("normal")}
 					>
 						调用 inc()
-					</button>
-					<button
-						className={styles.secondaryButton}
-						type="button"
-						onClick={() => handleIncrement("param")}
+					</Button>
+					<Button
+						disabled={!!loadingType}
+						loading={loadingType === "params"}
+						loadingText="调用中..."
+						onClick={() => handleIncrement("params")}
+						variant="secondary"
 					>
-						调用 incBy()
-					</button>
+						调用 incBy(1)
+					</Button>
 				</div>
 			</div>
 		</section>
