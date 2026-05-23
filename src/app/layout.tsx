@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import EtherProviderContent from "@/provider/EtherProvider"
 import { Geist, Geist_Mono } from "next/font/google"
+import { AntdRegistry } from "@ant-design/nextjs-registry"
 import "./globals.css"
 
 const geistSans = Geist({
@@ -26,7 +27,9 @@ export default function RootLayout({
 	return (
 		<html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
 			<body>
-				<EtherProviderContent>{children}</EtherProviderContent>
+				<EtherProviderContent>
+					<AntdRegistry>{children}</AntdRegistry>
+				</EtherProviderContent>
 			</body>
 		</html>
 	)
