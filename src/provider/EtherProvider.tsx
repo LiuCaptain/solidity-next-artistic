@@ -22,7 +22,20 @@ interface EtherState {
 	provider: BrowserProvider | null
 	signer: Signer | null
 	address: string | null
+	balance: bigint | null
+	chainId: number | null
 }
+
+type DetermineNetworkResult =
+	| {
+			success: true
+			provider: BrowserProvider
+			signer: Signer
+			address: string
+			balance: bigint
+			chainId: number
+	  }
+	| { success: false }
 
 const EtherProviderContext = createContext<ContextProps | null>(null)
 
@@ -31,10 +44,12 @@ const EtherProviderContent: React.FC<EtherProviderContentProps> = ({ children })
 	const [etherState, setEtherState] = useState<EtherState>({
 		provider: null,
 		signer: null,
-		address: null
+		address: null,
+		balance: null,
+		chainId: null
 	})
 
-	const connectOnce = useCallback(async () => {
+	const connectAction = useCallback(async () => {
 		if (window.ethereum === undefined || window.ethereum === null) {
 			api.error({ description: "请安装 Metamask 钱包" })
 			throw new Error("请安装 Metamask 钱包")
@@ -44,68 +59,60 @@ const EtherProviderContent: React.FC<EtherProviderContentProps> = ({ children })
 		const address = await signer.getAddress()
 		const balance = await provider.getBalance(address)
 		const network = await provider.getNetwork()
-		const chainId = network.chainId
-
-		setEtherState({
-			provider: provider,
-			signer: signer,
-			address: address
-		})
-		console.log(
-			"provider",
-			provider,
-			"signer",
-			signer,
-			"address",
-			address,
-			"balance",
-			balance,
-			"chainId",
-			chainId
-		)
+		const chainId = Number(network.chainId)
 
 		return { provider, signer, address, balance, chainId }
 	}, [api])
 
-	const tryConnect = useCallback(async () => {
-		const { chainId, address, provider, signer } = await connectOnce()
-		const targetChainId = chainId.toString()
+	const determineNetwork = useCallback(async (): Promise<DetermineNetworkResult> => {
+		const { provider, signer, address, balance, chainId } = await connectAction()
+		const currentChainId = chainId.toString()
 		const supportedChainId = getDefaultNetworkConfig().chainId.toString()
-
-		if (targetChainId === supportedChainId) {
+		if (currentChainId === supportedChainId) {
+			setEtherState({
+				provider: provider,
+				signer: signer,
+				address: address,
+				balance: balance,
+				chainId: chainId
+			})
 			const message = `钱包连接成功，当前链接账号：${address}`
 			api.success({ description: message })
-			return { success: true, provider, signer, address }
+			return { success: true, provider, signer, address, balance, chainId }
 		} else {
 			const message = `当前钱包网络与应用支持的网络不一致，请切换到${supportedChainId}网络`
 			api.error({ description: message })
 			return { success: false }
 		}
-	}, [connectOnce, api])
+	}, [connectAction, api])
 
 	const connectWallet = useCallback(async () => {
-		const { success } = await tryConnect()
-		if (success) return
+		const determineResult = await determineNetwork()
+		if (determineResult.success) return
 		const defaultNetworkConfig = getDefaultNetworkConfig()
 		try {
 			await window.ethereum!.request({
 				method: "wallet_switchEthereumChain",
 				params: defaultNetworkConfig.params
 			})
+			await determineNetwork()
 		} catch (error) {
 			console.log(error)
 			await window.ethereum!.request({
 				method: "wallet_addEthereumChain",
 				params: defaultNetworkConfig.params
 			})
+			await determineNetwork()
 		}
-	}, [tryConnect])
+	}, [determineNetwork])
 
 	const disconnectWallet = useCallback(() => {
 		setEtherState({
 			provider: null,
 			signer: null,
-			address: null
+			address: null,
+			balance: null,
+			chainId: null
 		})
 	}, [])
 
