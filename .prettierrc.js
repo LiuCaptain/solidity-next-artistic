@@ -3,6 +3,7 @@
  * @type {import("prettier").Config}
  */
 const config = {
+	plugins: ["prettier-plugin-solidity"],
 	experimentalTernaries: false,
 	experimentalOperatorPosition: "end",
 	printWidth: 100,
@@ -25,7 +26,15 @@ const config = {
 	htmlWhitespaceSensitivity: "css",
 	vueIndentScriptAndStyle: false,
 	embeddedLanguageFormatting: "auto",
-	singleAttributePerLine: false
+	singleAttributePerLine: false,
+	overrides: [
+		{
+			files: "*.sol",
+			options: {
+				parser: "slang"
+			}
+		}
+	]
 }
 
 export default config
