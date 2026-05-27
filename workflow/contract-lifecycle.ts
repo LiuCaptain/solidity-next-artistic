@@ -27,14 +27,15 @@ const chainId = currentNetwork.chainId
 switch (process.env.type) {
 	case "test": {
 		const command = `${currentContract.testValue} --network ${currentNetwork.value}`
-		const result = parseCommandString(command)
-		await execa`${result}`
+		console.log("command", command)
+		const [file, ...args] = parseCommandString(command)
+		await execa(file, args, { stdio: "inherit" })
 		break
 	}
 	case "deploy": {
 		const command = `${currentContract.deployValue} --network ${currentNetwork.value}`
-		const result = parseCommandString(command)
-		await execa`${result}`
+		const [file, ...args] = parseCommandString(command)
+		await execa(file, args, { stdio: "inherit" })
 
 		const deployedAddressesPath = `ignition/deployments/chain-${chainId}/deployed_addresses.json`
 		const fileJSON = await readFile(deployedAddressesPath, "utf-8")
