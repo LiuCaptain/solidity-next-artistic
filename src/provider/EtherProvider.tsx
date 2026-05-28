@@ -39,6 +39,13 @@ type DetermineNetworkResult =
 
 const EtherProviderContext = createContext<ContextProps | null>(null)
 
+const getErrorCode = (error: unknown) => {
+	if (typeof error === "object" && error !== null && "code" in error) {
+		return (error as { code: unknown }).code
+	}
+	return null
+}
+
 const EtherProviderContent: React.FC<EtherProviderContentProps> = ({ children }) => {
 	const [api, contextHolder] = notification.useNotification()
 	const [etherState, setEtherState] = useState<EtherState>({
@@ -48,6 +55,28 @@ const EtherProviderContent: React.FC<EtherProviderContentProps> = ({ children })
 		balance: null,
 		chainId: null
 	})
+
+	const addEthereumChain = useCallback(async () => {
+		try {
+			await window.ethereum!.request({
+				method: "wallet_addEthereumChain",
+				params: getDefaultNetworkConfig().params
+			})
+		} catch (error: any) {
+			if (getErrorCode(error) === 4001) {
+				api.error({ description: "用户拒绝了添加网络" })
+			} else {
+				api.error({ description: error.message })
+			}
+		}
+	}, [api])
+
+	const switchEthereumChain = useCallback(async () => {
+		await window.ethereum!.request({
+			method: "wallet_switchEthereumChain",
+			params: [{ chainId: getDefaultNetworkConfig().params[0].chainId }]
+		})
+	}, [])
 
 	const connectAction = useCallback(async () => {
 		if (window.ethereum === undefined || window.ethereum === null) {
@@ -89,22 +118,22 @@ const EtherProviderContent: React.FC<EtherProviderContentProps> = ({ children })
 	const connectWallet = useCallback(async () => {
 		const determineResult = await determineNetwork()
 		if (determineResult.success) return
-		const defaultNetworkConfig = getDefaultNetworkConfig()
 		try {
-			await window.ethereum!.request({
-				method: "wallet_switchEthereumChain",
-				params: defaultNetworkConfig.params
-			})
+			await switchEthereumChain()
+			console.log("【切换网络成功！】")
 			await determineNetwork()
-		} catch (error) {
-			console.log(error)
-			await window.ethereum!.request({
-				method: "wallet_addEthereumChain",
-				params: defaultNetworkConfig.params
-			})
-			await determineNetwork()
+		} catch (error: unknown) {
+			if (getErrorCode(error) === 4902) {
+				console.log("【切换网络失败，开始添加网络！】")
+				await addEthereumChain()
+				await switchEthereumChain()
+				await determineNetwork()
+				console.log("【添加网络成功，切换网络成功！】")
+			} else {
+				api.error({ description: "切换钱包网络失败" })
+			}
 		}
-	}, [determineNetwork])
+	}, [determineNetwork, addEthereumChain, switchEthereumChain, api])
 
 	const disconnectWallet = useCallback(() => {
 		setEtherState({

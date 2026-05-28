@@ -26,8 +26,8 @@ const netWorkConfig: NetworkConfig[] = [
 				rpcUrls: ["http://127.0.0.1:8545"],
 				chainName: "localhost-hardhat",
 				nativeCurrency: {
-					name: "hardhatETH",
-					symbol: "hardhatETH",
+					name: "Hardhat Ether",
+					symbol: "ETH",
 					decimals: 18
 				},
 				blockExplorerUrls: ["https://polygonscan.com"]
