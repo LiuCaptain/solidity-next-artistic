@@ -90,6 +90,7 @@ const EtherProviderContent: React.FC<EtherProviderContentProps> = ({ children })
 		const { provider, signer, address, balance, chainId } = await connectAction()
 		const currentChainId = chainId.toString()
 		const supportedChainId = getDefaultNetworkConfig().chainId.toString()
+		const supportedChainName = getDefaultNetworkConfig().params[0].chainName
 		if (currentChainId === supportedChainId) {
 			setEtherState({
 				provider: provider,
@@ -102,7 +103,7 @@ const EtherProviderContent: React.FC<EtherProviderContentProps> = ({ children })
 			api.success({ description: message })
 			return { success: true, provider, signer, address, balance, chainId }
 		} else {
-			const message = `当前钱包网络与应用支持的网络不一致，请切换到${supportedChainId}网络`
+			const message = `当前钱包网络与应用支持的网络不一致，请切换到 ${supportedChainName} 网络`
 			api.error({ description: message })
 			return { success: false }
 		}
