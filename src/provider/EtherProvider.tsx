@@ -100,7 +100,7 @@ const EtherProviderContent: React.FC<EtherProviderContentProps> = ({ children })
 				chainId: chainId
 			})
 			const message = `钱包连接成功，当前链接账号：${address}`
-			api.success({ description: message })
+			api.success({ description: <span style={{ wordBreak: "break-all" }}>{message}</span> })
 			return { success: true, provider, signer, address, balance, chainId }
 		} else {
 			const message = `当前钱包网络与应用支持的网络不一致，请切换到 ${supportedChainName} 网络`
