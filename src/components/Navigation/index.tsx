@@ -1,12 +1,20 @@
 "use client"
+import { useState } from "react"
+import Button from "@/components/Button"
 import styles from "./index.module.scss"
 import { useEtherProvider } from "@/provider/EtherProvider"
 
 const Navigation = () => {
 	const { connectWallet, isConnected } = useEtherProvider()
 
-	const handleConnectWallet = async () => {
-		await connectWallet()
+	const [connectLoading, setConnectLoading] = useState(false)
+	const handleConnectWallet = async (): Promise<void> => {
+		setConnectLoading(true)
+		try {
+			await connectWallet()
+		} finally {
+			setConnectLoading(false)
+		}
 	}
 
 	return (
@@ -22,9 +30,14 @@ const Navigation = () => {
 				<a href="#">开发文档</a>
 			</nav>
 
-			<button className={styles.walletButton} type="button" onClick={handleConnectWallet}>
+			<Button
+				className={styles.walletButton}
+				type="button"
+				loading={connectLoading}
+				onClick={handleConnectWallet}
+			>
 				{isConnected ? "已连接" : "链接钱包"}
-			</button>
+			</Button>
 		</header>
 	)
 }

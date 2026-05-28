@@ -99,8 +99,9 @@ const EtherProviderContent: React.FC<EtherProviderContentProps> = ({ children })
 				balance: balance,
 				chainId: chainId
 			})
-			const message = `钱包连接成功，当前链接账号：${address}`
+			const message = `钱包连接成功，当前连接账号：${address}`
 			api.success({ description: <span style={{ wordBreak: "break-all" }}>{message}</span> })
+			console.log(`【钱包连接成功：${address}】`)
 			return { success: true, provider, signer, address, balance, chainId }
 		} else {
 			const message = `当前钱包网络与应用支持的网络不一致，请切换到 ${supportedChainName} 网络`
@@ -120,6 +121,7 @@ const EtherProviderContent: React.FC<EtherProviderContentProps> = ({ children })
 			if (error.code === 4902) {
 				console.log("【切换网络失败，开始添加网络！】")
 				await addEthereumChain()
+				console.log("继续执行")
 				await switchEthereumChain()
 				await determineNetwork()
 				console.log("【添加网络成功，切换网络成功！】")
