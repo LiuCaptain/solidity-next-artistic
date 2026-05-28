@@ -39,13 +39,6 @@ type DetermineNetworkResult =
 
 const EtherProviderContext = createContext<ContextProps | null>(null)
 
-const getErrorCode = (error: unknown) => {
-	if (typeof error === "object" && error !== null && "code" in error) {
-		return (error as { code: unknown }).code
-	}
-	return null
-}
-
 const EtherProviderContent: React.FC<EtherProviderContentProps> = ({ children }) => {
 	const [api, contextHolder] = notification.useNotification()
 	const [etherState, setEtherState] = useState<EtherState>({
@@ -63,7 +56,7 @@ const EtherProviderContent: React.FC<EtherProviderContentProps> = ({ children })
 				params: getDefaultNetworkConfig().params
 			})
 		} catch (error: any) {
-			if (getErrorCode(error) === 4001) {
+			if (error.code === 4001) {
 				api.error({ description: "用户拒绝了添加网络" })
 			} else {
 				api.error({ description: error.message })
@@ -122,8 +115,8 @@ const EtherProviderContent: React.FC<EtherProviderContentProps> = ({ children })
 			await switchEthereumChain()
 			console.log("【切换网络成功！】")
 			await determineNetwork()
-		} catch (error: unknown) {
-			if (getErrorCode(error) === 4902) {
+		} catch (error: any) {
+			if (error.code === 4902) {
 				console.log("【切换网络失败，开始添加网络！】")
 				await addEthereumChain()
 				await switchEthereumChain()
