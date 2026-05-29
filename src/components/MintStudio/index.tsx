@@ -14,7 +14,8 @@ const MintStudio = () => {
 					</h1>
 					<p className={styles.subtitle}>
 						上传图片、填写名称与描述，元数据将存到 IPFS，再通过{" "}
-						<code className={styles.contractChip}>mint(to, tokenURI)</code> 写入合约。当前页面仅为界面预览。
+						<code className={styles.contractChip}>mint(to, tokenURI)</code>{" "}
+						写入合约。当前页面仅为界面预览。
 					</p>
 
 					<ol className={styles.steps} aria-label="铸造流程">
@@ -114,10 +115,18 @@ const MintStudio = () => {
 						</p>
 
 						<div className={styles.actions}>
-							<button className={`${styles.actionButton} ${styles.actionSecondary}`} type="button" disabled>
+							<button
+								className={`${styles.actionButton} ${styles.actionSecondary}`}
+								type="button"
+								disabled
+							>
 								重置
 							</button>
-							<button className={`${styles.actionButton} ${styles.actionPrimary}`} type="button" disabled>
+							<button
+								className={`${styles.actionButton} ${styles.actionPrimary}`}
+								type="button"
+								disabled
+							>
 								上传 IPFS 并铸造
 							</button>
 						</div>
