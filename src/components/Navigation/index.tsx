@@ -1,10 +1,13 @@
 "use client"
 import { useState } from "react"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
 import Button from "@/components/Button"
 import styles from "./index.module.scss"
 import { useEtherProvider } from "@/provider/EtherProvider"
 
 const Navigation = () => {
+	const pathname = usePathname()
 	const { connectWallet, isConnected } = useEtherProvider()
 
 	const [connectLoading, setConnectLoading] = useState(false)
@@ -19,15 +22,19 @@ const Navigation = () => {
 
 	return (
 		<header className={styles.header}>
-			<a className={styles.brand} href="#">
+			<Link className={styles.brand} href="/">
 				Artistic Contracts
-			</a>
+			</Link>
 
 			<nav className={styles.nav} aria-label="Primary navigation">
-				<a href="#">合约市场</a>
+				<Link className={pathname === "/" ? styles.navActive : undefined} href="/">
+					控制台
+				</Link>
+				<Link className={pathname === "/mint" ? styles.navActive : undefined} href="/mint">
+					铸造 NFT
+				</Link>
 				<a href="#">部署工具</a>
 				<a href="#">链上数据</a>
-				<a href="#">开发文档</a>
 			</nav>
 
 			<Button
