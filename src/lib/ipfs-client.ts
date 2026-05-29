@@ -22,7 +22,7 @@ async function postToIpfsApi(body: FormData): Promise<UploadResponse> {
 }
 
 /** 上传图片文件，返回 CID */
-export async function uploadImageToIpfs(file: File): Promise<string> {
+export async function uploadImageToIPFS(file: File): Promise<string> {
 	const formData = new FormData()
 	formData.append("file", file)
 	const { cid } = await postToIpfsApi(formData)
@@ -51,7 +51,7 @@ export async function prepareNftTokenUri(
 	file: File,
 	meta: Omit<NFTMeta, "imageUri">
 ): Promise<{ imageCid: string; tokenUri: string }> {
-	const imageCid = await uploadImageToIpfs(file)
+	const imageCid = await uploadImageToIPFS(file)
 	const metadataCid = await uploadNftMetadataToIpfs({
 		...meta,
 		imageUri: toIpfsUri(imageCid)

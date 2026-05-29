@@ -1,5 +1,11 @@
 "use client"
+import { ChangeEvent, useCallback } from "react"
+import Image from "next/image"
+import { useImmer } from "use-immer"
+import { uploadImageToIPFS } from "@/lib/ipfs-client"
+import { toIpfsUri, resolveIpfsUrl } from "@/lib/ipfs-utils"
 import { useEtherProvider } from "@/provider/EtherProvider"
+import { NFTMeta } from "@/types/NFT"
 import styles from "./index.module.scss"
 
 /**
@@ -7,6 +13,22 @@ import styles from "./index.module.scss"
  */
 const MintStudio = () => {
 	const { isConnected } = useEtherProvider()
+
+	const [metaData, setMetaData] = useImmer<NFTMeta>({
+		imageUri: "",
+		name: "",
+		description: ""
+	})
+	const handleUploadImage = useCallback(
+		async (event: ChangeEvent<HTMLInputElement>) => {
+			const file = event.target.files![0]
+			const cid = await uploadImageToIPFS(file)
+			setMetaData((draft) => {
+				draft.imageUri = toIpfsUri(cid)
+			})
+		},
+		[setMetaData]
+	)
 
 	return (
 		<section className={styles.studio} aria-labelledby="mint-title">
@@ -39,14 +61,8 @@ const MintStudio = () => {
 				</header>
 
 				<div className={styles.walletBar}>
-					<span className={styles.walletLabel}>
-						{isConnected ? "钱包已连接，可以开始铸造" : "铸造前需连接钱包"}
-					</span>
-					<span
-						className={`${styles.walletBadge} ${isConnected ? styles.walletBadgeConnected : styles.walletBadgeDisconnected}`}
-					>
-						{isConnected ? "已连接" : "未连接"}
-					</span>
+					<span className={styles.walletLabel}>铸造前需连接钱包</span>
+					<span className={styles.walletBadge}>{isConnected ? "已连接" : "未连接"}</span>
 				</div>
 
 				<div className={styles.grid}>
@@ -71,6 +87,7 @@ const MintStudio = () => {
 									type="file"
 									accept="image/png,image/jpeg,image/gif,image/webp"
 									aria-labelledby="mint-image-label"
+									onChange={handleUploadImage}
 								/>
 							</div>
 							<p className={styles.hint}>接入逻辑后将调用 uploadImageToIpfs</p>
@@ -146,7 +163,11 @@ const MintStudio = () => {
 						<h2 className={styles.panelTitle}>预览与进度</h2>
 
 						<div className={styles.previewFrame} aria-label="作品预览占位">
-							上传图片后在此预览
+							{metaData.imageUri ? (
+								<Image fill={true} src={resolveIpfsUrl(metaData.imageUri)} alt=""></Image>
+							) : (
+								"上传图片后在此预览"
+							)}
 						</div>
 
 						<dl className={styles.metaList}>
