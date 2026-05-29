@@ -1,9 +1,13 @@
+"use client"
+import { useEtherProvider } from "@/provider/EtherProvider"
 import styles from "./index.module.scss"
 
 /**
  * NFT 铸造页静态 UI（仅布局与样式，不含 IPFS / 合约逻辑）
  */
 const MintStudio = () => {
+	const { isConnected } = useEtherProvider()
+
 	return (
 		<section className={styles.studio} aria-labelledby="mint-title">
 			<div className={styles.shell}>
@@ -35,8 +39,14 @@ const MintStudio = () => {
 				</header>
 
 				<div className={styles.walletBar}>
-					<span className={styles.walletLabel}>铸造前需连接钱包</span>
-					<span className={styles.walletBadge}>未连接</span>
+					<span className={styles.walletLabel}>
+						{isConnected ? "钱包已连接，可以开始铸造" : "铸造前需连接钱包"}
+					</span>
+					<span
+						className={`${styles.walletBadge} ${isConnected ? styles.walletBadgeConnected : styles.walletBadgeDisconnected}`}
+					>
+						{isConnected ? "已连接" : "未连接"}
+					</span>
 				</div>
 
 				<div className={styles.grid}>
